@@ -26,6 +26,7 @@ async function run() {
 
         // create, connect DB & Collection
         const usersCollection = client.db('summerCampDB').collection('users');
+        const sliderCollection = client.db('summerCampDB').collection('slider');
 
         // Register.jsx, SocialLogin.jsx store user info to DB
         app.post('/users', async (req, res) => {
@@ -44,6 +45,12 @@ async function run() {
             const result = await usersCollection.find().toArray();
             res.send(result);
         })
+        // display users info in server
+        // http://localhost:5000/slider
+        app.get('/slider', async (req, res) => {
+            const result = await sliderCollection.find().toArray();
+            res.send(result);
+        })
 
         // ping to DB
         await client.db("admin").command({ ping: 1 });
@@ -56,9 +63,9 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Multi Tounges Summer Camp Server is Running...')
+    res.send('Multi Tongue Summer Camp Server is Running...')
 })
 
 app.listen(port, () => {
-    console.log(`Multi Tounges Summer Camp Server is Running on port: ${port}`)
+    console.log(`Multi Tongue Summer Camp Server is Running on port: ${port}`)
 })
