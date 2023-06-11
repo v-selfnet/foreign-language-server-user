@@ -13,34 +13,44 @@ console.log(process.env.DB_USER)
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.vgnfmcl.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
 });
 
 async function run() {
-  try {
-    await client.connect();
+    try {
+        await client.connect();
 
-    // create, connect DB & Collection
-    const usersCollection = client.db('summerCampDB').collection('users');
+        // create, connect DB & Collection
+        const usersCollection = client.db('summerCampDB').collection('users');
 
-    // from Register.jsx, store user info to DB
-    app.post('/users', async(req, res) => {
-        const user = req.body;
-        console.log(user)
-        const result = await usersCollection.insertOne(user);
-        res.send(result);
-    })
+        // Register.jsx, SocialLogin.jsx store user info to DB
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            // social login check user existent
+            const query = { email: user.email };
+            const existingUser = await usersCollection.findOne(query);
+            if (existingUser) return;
+            const result = await usersCollection.insertOne(user);
+            res.send(result);
+        })
 
-    // ping to DB
-    await client.db("admin").command({ ping: 1 });
-    console.log("Multi Tounges Summer Camp Server successfully connected to MongoDB!");
-  } finally {
-    // await client.close();
-  }
+        // display users info in server
+        // http://localhost:5000/users
+        app.get('/users', async (req, res) => {
+            const result = await usersCollection.find().toArray();
+            res.send(result);
+        })
+
+        // ping to DB
+        await client.db("admin").command({ ping: 1 });
+        console.log("Multi Tounges Summer Camp Server successfully connected to MongoDB!");
+    } finally {
+        // await client.close();
+    }
 }
 run().catch(console.dir);
 
