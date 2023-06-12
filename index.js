@@ -9,7 +9,7 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 app.use(cors());
 app.use(express.json());
 
-console.log(process.env.DB_USER)
+// console.log(process.env.DB_USER)
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.vgnfmcl.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -27,6 +27,8 @@ async function run() {
         // create, connect DB & Collection
         const usersCollection = client.db('summerCampDB').collection('users');
         const sliderCollection = client.db('summerCampDB').collection('slider');
+        const coursesCollection = client.db('summerCampDB').collection('courses');
+        const instructorCollection = client.db('summerCampDB').collection('instructor');
 
         // Register.jsx, SocialLogin.jsx store user info to DB
         app.post('/users', async (req, res) => {
@@ -49,6 +51,20 @@ async function run() {
         // http://localhost:5000/slider
         app.get('/slider', async (req, res) => {
             const result = await sliderCollection.find().toArray();
+            res.send(result);
+        })
+
+        // display courses info in server
+        // http://localhost:5000/courses
+        app.get('/courses', async (req, res) => {
+            const result = await coursesCollection.find().toArray();
+            res.send(result);
+        })
+
+        // display instructor info in server
+        // http://localhost:5000/instructor
+        app.get('/instructor', async (req, res) => {
+            const result = await instructorCollection.find().toArray();
             res.send(result);
         })
 
