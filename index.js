@@ -29,6 +29,8 @@ async function run() {
         const sliderCollection = client.db('summerCampDB').collection('slider');
         const coursesCollection = client.db('summerCampDB').collection('courses');
         const instructorCollection = client.db('summerCampDB').collection('instructor');
+        const reviewsCollection = client.db('summerCampDB').collection('reviews');
+        const favoriteCollection = client.db('summerCampDB').collection('favorite');
 
         // Register.jsx, SocialLogin.jsx store user info to DB
         app.post('/users', async (req, res) => {
@@ -47,6 +49,15 @@ async function run() {
             const result = await usersCollection.find().toArray();
             res.send(result);
         })
+
+        // display logged user in dashboard
+        app.get('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await usersCollection.findOne(query);
+            res.send(result)
+          })
+
         // display users info in server
         // http://localhost:5000/slider
         app.get('/slider', async (req, res) => {
@@ -67,6 +78,21 @@ async function run() {
             const result = await instructorCollection.find().toArray();
             res.send(result);
         })
+
+        // display reviews info in server
+        // http://localhost:5000/reviews
+        app.get('/reviews', async (req, res) => {
+            const result = await reviewsCollection.find().toArray();
+            res.send(result);
+        })
+
+        app.post('/favorite', async (req, res) => {
+            const item = req.body;
+            // console.log(item);
+            const result = await favoriteCollection.insertOne(item);
+            res.send(result)
+          })
+      
 
         // ping to DB
         await client.db("admin").command({ ping: 1 });
