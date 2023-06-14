@@ -56,7 +56,7 @@ async function run() {
             const query = { _id: new ObjectId(id) };
             const result = await usersCollection.findOne(query);
             res.send(result)
-          })
+        })
 
         // display users info in server
         // http://localhost:5000/slider
@@ -86,17 +86,37 @@ async function run() {
             res.send(result);
         })
 
+        // create new collection by user favorite data
+        // http://localhost:5000/favorite
         app.post('/favorite', async (req, res) => {
             const item = req.body;
-            // console.log(item);
             const result = await favoriteCollection.insertOne(item);
             res.send(result)
-          })
-      
+        })
+
+        // display all users favorite info in server
+        // http://localhost:5000/favorite
+        // app.get('/favorite', async (req, res) => {
+        //     const result = await favoriteCollection.find().toArray();
+        //     res.send(result);
+        // })
+
+        // display user specific data in My Favorite
+        // http://localhost:5000/favorite?email=vselfnet@gmail.com
+        app.get('/favorite', async (req, res) => {
+            const email = req.query.email;
+            if (!email) {
+                res.send([])
+            }
+            const query = { email: email };
+            const result = await favoriteCollection.find(query).toArray();
+            res.send(result);
+        })
+
 
         // ping to DB
         await client.db("admin").command({ ping: 1 });
-        console.log("Multi Tounges Summer Camp Server successfully connected to MongoDB!");
+        console.log("Multi Tounge Summer Camp Server successfully connected to MongoDB!");
     } finally {
         // await client.close();
     }
