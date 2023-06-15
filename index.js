@@ -63,13 +63,13 @@ async function run() {
             res.send(result)
         })
 
-        // display logged user in dashboard
-        // app.get('/users/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     const query = { _id: new ObjectId(id) };
-        //     const result = await usersCollection.findOne(query);
-        //     res.send(result)
-        // })
+        // delete user from ManageUsers.jsx [admin can delete]
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await usersCollection.deleteOne(query);
+            res.send(result)
+        })
 
         // display users info in server
         // http://localhost:5000/slider
@@ -107,13 +107,6 @@ async function run() {
             res.send(result)
         })
 
-        // display all users favorite info in server
-        // http://localhost:5000/favorite
-        // app.get('/favorite', async (req, res) => {
-        //     const result = await favoriteCollection.find().toArray();
-        //     res.send(result);
-        // })
-
         // display user specific data in My Favorite
         // http://localhost:5000/favorite?email=vselfnet@gmail.com
         app.get('/favorite', async (req, res) => {
@@ -124,6 +117,14 @@ async function run() {
             const query = { email: email };
             const result = await favoriteCollection.find(query).toArray();
             res.send(result);
+        })
+
+        // delete item from Favorite.jsx [user can delete]
+        app.delete('/favorite/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await favoriteCollection.deleteOne(query);
+            res.send(result)
         })
 
         // create new collection by user enroll data
@@ -144,6 +145,14 @@ async function run() {
             const query = { email: email };
             const result = await enrollCollection.find(query).toArray();
             res.send(result);
+        })
+
+        // delete item from Enroll.jsx [user can delete]
+        app.delete('/enroll/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await enrollCollection.deleteOne(query);
+            res.send(result)
         })
 
 
