@@ -31,6 +31,7 @@ async function run() {
         const instructorCollection = client.db('summerCampDB').collection('instructor');
         const reviewsCollection = client.db('summerCampDB').collection('reviews');
         const favoriteCollection = client.db('summerCampDB').collection('favorite');
+        const enrollCollection = client.db('summerCampDB').collection('enroll');
 
         // Register.jsx, SocialLogin.jsx store user info to DB
         app.post('/users', async (req, res) => {
@@ -51,12 +52,12 @@ async function run() {
         })
 
         // display logged user in dashboard
-        app.get('/users/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) };
-            const result = await usersCollection.findOne(query);
-            res.send(result)
-        })
+        // app.get('/users/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: new ObjectId(id) };
+        //     const result = await usersCollection.findOne(query);
+        //     res.send(result)
+        // })
 
         // display users info in server
         // http://localhost:5000/slider
@@ -110,6 +111,26 @@ async function run() {
             }
             const query = { email: email };
             const result = await favoriteCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        // create new collection by user enroll data
+        // http://localhost:5000/enroll
+        app.post('/enroll', async (req, res) => {
+            const item = req.body;
+            const result = await enrollCollection.insertOne(item);
+            res.send(result)
+        })
+
+        // display user specific data in enroll classes
+        // http://localhost:5000/enroll?email=haqueflora@gmail.com
+        app.get('/enroll', async (req, res) => {
+            const email = req.query.email;
+            if (!email) {
+                res.send([])
+            }
+            const query = { email: email };
+            const result = await enrollCollection.find(query).toArray();
             res.send(result);
         })
 
