@@ -45,7 +45,7 @@ async function run() {
         })
 
         // display users info in server
-        // http://localhost:5000/users
+        // https://foreign-language-server-pi.vercel.app/users
         app.get('/users', async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result);
@@ -72,35 +72,35 @@ async function run() {
         })
 
         // display users info in server
-        // http://localhost:5000/slider
+        // https://foreign-language-server-pi.vercel.app/slider
         app.get('/slider', async (req, res) => {
             const result = await sliderCollection.find().toArray();
             res.send(result);
         })
 
         // display courses info in server
-        // http://localhost:5000/courses
+        // https://foreign-language-server-pi.vercel.app/courses
         app.get('/courses', async (req, res) => {
             const result = await coursesCollection.find().toArray();
             res.send(result);
         })
 
         // display instructor info in server
-        // http://localhost:5000/instructor
+        // https://foreign-language-server-pi.vercel.app/instructor
         app.get('/instructor', async (req, res) => {
             const result = await instructorCollection.find().toArray();
             res.send(result);
         })
 
         // display reviews info in server
-        // http://localhost:5000/reviews
+        // https://foreign-language-server-pi.vercel.app/reviews
         app.get('/reviews', async (req, res) => {
             const result = await reviewsCollection.find().toArray();
             res.send(result);
         })
 
         // create new collection by user favorite data
-        // http://localhost:5000/favorite
+        // https://foreign-language-server-pi.vercel.app/favorite
         app.post('/favorite', async (req, res) => {
             const item = req.body;
             const result = await favoriteCollection.insertOne(item);
@@ -108,7 +108,7 @@ async function run() {
         })
 
         // display user specific data in My Favorite
-        // http://localhost:5000/favorite?email=vselfnet@gmail.com
+        // https://foreign-language-server-pi.vercel.app/favorite?email=vselfnet@gmail.com
         app.get('/favorite', async (req, res) => {
             const email = req.query.email;
             if (!email) {
@@ -128,7 +128,7 @@ async function run() {
         })
 
         // create new collection by user enroll data
-        // http://localhost:5000/enroll
+        // https://foreign-language-server-pi.vercel.app/enroll
         app.post('/enroll', async (req, res) => {
             const item = req.body;
             const result = await enrollCollection.insertOne(item);
@@ -136,7 +136,7 @@ async function run() {
         })
 
         // display user specific data in enroll classes
-        // http://localhost:5000/enroll?email=haqueflora@gmail.com
+        // https://foreign-language-server-pi.vercel.app/enroll?email=haqueflora@gmail.com
         app.get('/enroll', async (req, res) => {
             const email = req.query.email;
             if (!email) {
