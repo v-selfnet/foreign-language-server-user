@@ -3,13 +3,33 @@ const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 5000
 require('dotenv').config();
+var jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // middleware
 app.use(cors());
 app.use(express.json());
 
-// console.log(process.env.DB_USER)
+// verify token middleware
+const verifyJWT = (req, res, next) => {
+    const authorization = req.headers.authorization;
+    console.log('verifyJWT auth:', authorization)
+    if (!authorization) {
+        return res.status(401).send({ error: true, messag: 'first: unauthorized access' })
+    }
+    const token = authorization.split(' ')[1];
+    // console.log('verify token middleware', token);
+    jwt.verify(token, process.env.SECRET_TOKEN, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ error: true, messag: 'unauthorized access [after get token from client]' })
+        }
+        req.decoded = decoded;
+        console.log('decode verifyJWT middleware: ', decoded);
+        next();
+    })
+}
+
+// console.log(process.env.SECRET_TOKEN)
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.vgnfmcl.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -33,6 +53,29 @@ async function run() {
         const favoriteCollection = client.db('summerCampDB').collection('favorite');
         const enrollCollection = client.db('summerCampDB').collection('enroll');
 
+        // server create JWT new token each hit
+        // from AuthProvider.jsx
+        // $ npm install jsonwebtoken
+        app.post('/jwt', (req, res) => {
+            // app.get('/jwt', (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.SECRET_TOKEN, { expiresIn: '1h' });
+            // console.log(token);
+            res.send({ token });
+        })
+
+        // warning: use verifyJWT before using verifyAdmin
+        // middleware
+        const verifyAdmin = async (req, res, next) => {
+            const email = req.decoded.email;
+            const query = { email: email }
+            const user = await usersCollection.findOne(query);
+            if (user?.role !== 'admin') {
+                return res.status(403).send({ error: true, message: 'forbidden message from verrfyAdmin' });
+            }
+            next();
+        }
+
         // Register.jsx, SocialLogin.jsx store user info to DB
         app.post('/users', async (req, res) => {
             const user = req.body;
@@ -46,7 +89,9 @@ async function run() {
 
         // display users info in server
         // http://localhost:5000/users
-        app.get('/users', async (req, res) => {
+        // from ManageUser.jsx only admin can access this link
+        app.get('/users', verifyJWT, verifyAdmin, async (req, res) => {
+            // app.get('/users', async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result);
         })
@@ -70,6 +115,23 @@ async function run() {
             const result = await usersCollection.deleteOne(query);
             res.send(result)
         })
+
+        // check admin user or not
+        // request from useAdmin.jsx
+        app.get('/users/admin/:email', verifyJWT, async (req, res) => {
+            const email = req.params.email;
+            console.log('check admin:', email);
+            if (req.decoded.email !== email) {
+                console.log('send admin false')
+                res.send({ admin: false })
+            }
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+            const result = { admin: user?.role === 'admin' }
+            console.log('he is admin', result )
+            res.send(result);
+        })
+
 
         // display users info in server
         // http://localhost:5000/slider
